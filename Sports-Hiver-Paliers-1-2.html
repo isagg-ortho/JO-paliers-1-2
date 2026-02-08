@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Découvre les sports d'hiver</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #01579b;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #0277bd;
+            font-size: 1.1rem;
+        }
+
+        .olympics-rings {
+            font-size: 2rem;
+            margin: 15px 0;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 3px solid transparent;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .card.active {
+            border-color: #0288d1;
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .card h2 {
+            color: #01579b;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        .card-preview {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .reading-section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .reading-section.visible {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .reading-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .reading-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .reading-title h2 {
+            color: #01579b;
+            font-size: 1.5rem;
+        }
+
+        .reading-icon {
+            font-size: 2.5rem;
+        }
+
+        .audio-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-listen {
+            background: #4caf50;
+            color: white;
+        }
+
+        .btn-listen:hover {
+            background: #43a047;
+        }
+
+        .btn-listen.playing {
+            background: #ff9800;
+        }
+
+        .btn-stop {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-stop:hover {
+            background: #e53935;
+        }
+
+        .btn-back {
+            background: #78909c;
+            color: white;
+        }
+
+        .btn-back:hover {
+            background: #607d8b;
+        }
+
+        .text-content {
+            font-size: 1.3rem;
+            line-height: 2;
+            color: #333;
+            margin: 25px 0;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 12px;
+        }
+
+        .text-content p {
+            margin-bottom: 15px;
+        }
+
+        .text-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        .athlete-info {
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-radius: 12px;
+        }
+
+        .athlete-info h3 {
+            color: #01579b;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .athlete-info p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            padding: 15px;
+            background: #e8f5e9;
+            border-radius: 10px;
+            flex-wrap: wrap;
+        }
+
+        .speed-control label {
+            font-weight: 600;
+            color: #2e7d32;
+        }
+
+        .speed-slider {
+            width: 150px;
+            cursor: pointer;
+        }
+
+        .speed-value {
+            font-weight: 600;
+            color: #2e7d32;
+            min-width: 50px;
+        }
+
+        .instructions {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+            font-size: 1.1rem;
+        }
+
+        .surface-tag {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .surface-glace {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .surface-neige {
+            background: #fce4ec;
+            color: #c2185b;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .text-content {
+                font-size: 1.1rem;
+            }
+            
+            .btn {
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
+
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏔️ Découvre les sports d'hiver ❄️</h1>
+            <div class="olympics-rings">⛷️🏂⛸️🎿🏒</div>
+            <p class="subtitle">Clique sur un sport pour lire et écouter !</p>
+        </header>
+
+        <div class="card-grid" id="cardGrid">
+            <div class="card" data-sport="patinage">
+                <div class="card-icon">⛸️</div>
+                <h2>Le patinage artistique</h2>
+                <p class="card-preview">Danser et sauter sur la glace...</p>
+                <span class="surface-tag surface-glace">🧊 Sur la glace</span>
+            </div>
+
+            <div class="card" data-sport="vitesse">
+                <div class="card-icon">🏃</div>
+                <h2>Le patinage de vitesse</h2>
+                <p class="card-preview">Patiner le plus vite possible...</p>
+                <span class="surface-tag surface-glace">🧊 Sur la glace</span>
+            </div>
+
+            <div class="card" data-sport="ski">
+                <div class="card-icon">⛷️</div>
+                <h2>Le ski alpin</h2>
+                <p class="card-preview">Descendre la montagne très vite...</p>
+                <span class="surface-tag surface-neige">❄️ Sur la neige</span>
+            </div>
+
+            <div class="card" data-sport="acrobatique">
+                <div class="card-icon">🤸</div>
+                <h2>Le ski acrobatique</h2>
+                <p class="card-preview">Faire des sauts et des figures en ski...</p>
+                <span class="surface-tag surface-neige">❄️ Sur la neige</span>
+            </div>
+
+            <div class="card" data-sport="saut">
+                <div class="card-icon">🦅</div>
+                <h2>Le saut à ski</h2>
+                <p class="card-preview">Sauter très loin dans les airs...</p>
+                <span class="surface-tag surface-neige">❄️ Sur la neige</span>
+            </div>
+
+            <div class="card" data-sport="hockey">
+                <div class="card-icon">🏒</div>
+                <h2>Le hockey sur glace</h2>
+                <p class="card-preview">Un sport d'équipe rapide...</p>
+                <span class="surface-tag surface-glace">🧊 Sur la glace</span>
+            </div>
+
+            <div class="card" data-sport="luge">
+                <div class="card-icon">🛷</div>
+                <h2>La luge</h2>
+                <p class="card-preview">Glisser à toute vitesse sur le dos...</p>
+                <span class="surface-tag surface-glace">🧊 Sur la glace</span>
+            </div>
+
+            <div class="card" data-sport="snowboard">
+                <div class="card-icon">🏂</div>
+                <h2>La planche à neige</h2>
+                <p class="card-preview">Faire des sauts et des figures...</p>
+                <span class="surface-tag surface-neige">❄️ Sur la neige</span>
+            </div>
+
+            <div class="card" data-sport="curling">
+                <div class="card-icon">🥌</div>
+                <h2>Le curling</h2>
+                <p class="card-preview">Glisser une grosse pierre sur la glace...</p>
+                <span class="surface-tag surface-glace">🧊 Sur la glace</span>
+            </div>
+        </div>
+
+        <p class="instructions" id="instructions">👆 Choisis un sport pour commencer ta lecture !</p>
+
+        <div class="reading-section" id="readingSection">
+            <div class="reading-header">
+                <div class="reading-title">
+                    <span class="reading-icon" id="readingIcon"></span>
+                    <h2 id="readingTitle"></h2>
+                </div>
+                <div class="audio-controls">
+                    <button class="btn btn-listen" id="btnListen" onclick="toggleSpeech()">
+                        <span id="listenIcon">🔊</span>
+                        <span id="listenText">Écouter</span>
+                    </button>
+                    <button class="btn btn-stop" onclick="stopSpeech()">
+                        ⏹️ Arrêter
+                    </button>
+                </div>
+            </div>
+
+            <div class="speed-control">
+                <label for="speedSlider">🐢 Vitesse :</label>
+                <input type="range" id="speedSlider" class="speed-slider" min="0.5" max="1.2" step="0.1" value="0.8">
+                <span class="speed-value" id="speedValue">0.8x</span>
+                <span>🐇</span>
+            </div>
+
+            <div class="text-content" id="textContent"></div>
+
+            <div class="athlete-info" id="athleteInfo"></div>
+
+            <button class="btn btn-back" onclick="goBack()" style="margin-top: 20px;">
+                ← Retour aux sports
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const sportsData = {
+            patinage: {
+                icon: "⛸️",
+                title: "Le patinage artistique",
+                text: `Le patinage artistique est un sport très beau. Les athlètes patinent sur la glace. Ils font des sauts et des pirouettes.
+
+Les patineurs portent des costumes brillants. Ils dansent sur de la musique. C'est comme un spectacle !
+
+Pour faire du patinage artistique, il faut des patins spéciaux. Les patins ont une lame sous la botte. La lame glisse sur la glace.`,
+                athlete: {
+                    name: "Javier Fernández",
+                    country: "Espagne 🇪🇸",
+                    info: "Javier est un champion de patinage artistique. Il a gagné deux médailles de bronze aux grands jeux d'hiver. Il patine avec beaucoup de joie !"
+                }
+            },
+            vitesse: {
+                icon: "🏃",
+                title: "Le patinage de vitesse",
+                text: `Le patinage de vitesse est un sport très rapide. Les patineurs font la course sur une grande piste de glace. Ils patinent le plus vite possible !
+
+Les patineurs portent des combinaisons moulantes. Ils ont des casques pour se protéger. Leurs patins ont de très longues lames.
+
+Il y a deux types de patinage de vitesse. La longue piste ressemble à une grande boucle. La courte piste est plus petite et très excitante !`,
+                athlete: {
+                    name: "Kim Boutin",
+                    country: "Canada 🇨🇦",
+                    info: "Kim est une patineuse de vitesse du Québec. Elle a gagné plusieurs médailles aux grands jeux d'hiver. Elle est très rapide et courageuse !"
+                }
+            },
+            ski: {
+                icon: "⛷️",
+                title: "Le ski alpin",
+                text: `Le ski alpin est un sport de vitesse. Les skieurs descendent la montagne très vite. Ils peuvent aller à plus de 100 kilomètres à l'heure !
+
+Les skieurs portent un casque pour se protéger. Ils ont aussi des lunettes spéciales. Les skis sont longs et minces.
+
+Il y a des piquets sur la piste. Les skieurs doivent tourner autour des piquets. C'est difficile mais excitant !`,
+                athlete: {
+                    name: "Lindsey Vonn",
+                    country: "États-Unis 🇺🇸",
+                    info: "Lindsey est une skieuse très célèbre. Elle a gagné une médaille d'or aux grands jeux d'hiver. Elle est très courageuse et rapide !"
+                }
+            },
+            acrobatique: {
+                icon: "🤸",
+                title: "Le ski acrobatique",
+                text: `Le ski acrobatique est un sport spectaculaire. Les skieurs font des sauts incroyables. Ils tournent et font des figures dans les airs !
+
+Il y a plusieurs épreuves en ski acrobatique. Les bosses, c'est une piste avec plein de petites collines. Le saut, c'est pour voler très haut dans les airs.
+
+Les athlètes doivent être forts et souples. Ils pratiquent leurs sauts sur des trampolines. C'est un sport très impressionnant !`,
+                athlete: {
+                    name: "Mikaël Kingsbury",
+                    country: "Canada 🇨🇦",
+                    info: "Mikaël est le roi des bosses ! Il vient du Québec. Il a gagné la médaille d'or aux grands jeux d'hiver. C'est le meilleur au monde !"
+                }
+            },
+            saut: {
+                icon: "🦅",
+                title: "Le saut à ski",
+                text: `Le saut à ski est un sport impressionnant. Les athlètes glissent sur une grande rampe. Puis ils s'envolent dans les airs !
+
+Les sauteurs peuvent voler très loin. Les meilleurs sautent plus de 200 mètres ! On dirait des oiseaux dans le ciel.
+
+Pendant le vol, les athlètes gardent leurs skis en forme de V. Ils se penchent vers l'avant. L'atterrissage demande beaucoup de pratique.`,
+                athlete: {
+                    name: "Ryoyu Kobayashi",
+                    country: "Japon 🇯🇵",
+                    info: "Ryoyu est un champion de saut à ski. Il vient du Japon. Il vole très loin et atterrit toujours parfaitement !"
+                }
+            },
+            hockey: {
+                icon: "🏒",
+                title: "Le hockey sur glace",
+                text: `Le hockey sur glace est un sport d'équipe. Il y a six joueurs sur la glace pour chaque équipe. Ils patinent très vite !
+
+Les joueurs utilisent un bâton pour frapper la rondelle. La rondelle est un disque noir en caoutchouc. Le but est de mettre la rondelle dans le filet.
+
+Le gardien de but protège le filet. Il porte un gros équipement. Le hockey est un sport rapide et amusant !`,
+                athlete: {
+                    name: "Marie-Philip Poulin",
+                    country: "Canada 🇨🇦",
+                    info: "Marie-Philip est une joueuse de hockey du Québec. Elle a gagné trois médailles d'or avec l'équipe du Canada. On l'appelle « Capitaine Clutch » !"
+                }
+            },
+            luge: {
+                icon: "🛷",
+                title: "La luge",
+                text: `La luge est un sport de glisse. L'athlète est couché sur le dos. Il descend une piste de glace très vite !
+
+La luge est un petit traîneau. L'athlète se couche dessus, les pieds devant. Il peut aller à 140 kilomètres à l'heure !
+
+Pour diriger la luge, l'athlète bouge son corps. Il doit être très précis. C'est un sport qui demande du courage !`,
+                athlete: {
+                    name: "Natalie Geisenberger",
+                    country: "Allemagne 🇩🇪",
+                    info: "Natalie est une championne de luge. Elle a gagné six médailles d'or aux grands jeux d'hiver. Elle est la meilleure lugeuse du monde !"
+                }
+            },
+            snowboard: {
+                icon: "🏂",
+                title: "La planche à neige",
+                text: `La planche à neige est un sport sur la neige. On dit aussi « snowboard » en anglais. L'athlète glisse sur une planche.
+
+Les athlètes font des sauts incroyables. Ils tournent dans les airs. Ils font aussi des figures sur les rampes.
+
+La planche à neige est un sport jeune et amusant. Les athlètes portent des vêtements colorés. La musique joue souvent pendant les compétitions !`,
+                athlete: {
+                    name: "Chloe Kim",
+                    country: "États-Unis 🇺🇸",
+                    info: "Chloe est une championne de planche à neige. Elle a gagné la médaille d'or à seulement 17 ans ! Elle fait des figures incroyables !"
+                }
+            },
+            curling: {
+                icon: "🥌",
+                title: "Le curling",
+                text: `Le curling est un sport sur la glace. Les joueurs glissent de grosses pierres. Les pierres sont rondes et très lourdes.
+
+Le but est de placer les pierres près du centre. Le centre s'appelle « la maison ». L'équipe avec les pierres les plus proches gagne !
+
+Deux joueurs frottent la glace avec des balais. Cela aide la pierre à glisser. Le curling demande beaucoup de stratégie !`,
+                athlete: {
+                    name: "Jennifer Jones",
+                    country: "Canada 🇨🇦",
+                    info: "Jennifer Jones est une championne de curling. Elle a gagné une médaille d'or aux grands jeux d'hiver. Elle est très intelligente et calme sur la glace !"
+                }
+            }
+        };
+
+        let speechSynthesis = window.speechSynthesis;
+        let currentUtterance = null;
+        let isPlaying = false;
+
+        // Configuration des cartes
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('click', () => {
+                const sport = card.dataset.sport;
+                showSport(sport);
+            });
+        });
+
+        // Slider de vitesse
+        document.getElementById('speedSlider').addEventListener('input', (e) => {
+            document.getElementById('speedValue').textContent = e.target.value + 'x';
+        });
+
+        function showSport(sport) {
+            const data = sportsData[sport];
+            
+            document.getElementById('readingIcon').textContent = data.icon;
+            document.getElementById('readingTitle').textContent = data.title;
+            document.getElementById('textContent').innerHTML = data.text.split('\n\n').map(p => `<p>${p}</p>`).join('');
+            document.getElementById('athleteInfo').innerHTML = `
+                <h3>⭐ Athlète vedette : ${data.athlete.name}</h3>
+                <p><strong>Pays :</strong> ${data.athlete.country}</p>
+                <p>${data.athlete.info}</p>
+            `;
+
+            document.getElementById('instructions').style.display = 'none';
+            document.getElementById('readingSection').classList.add('visible');
+            
+            // Highlight active card
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+            document.querySelector(`[data-sport="${sport}"]`).classList.add('active');
+
+            // Stop any ongoing speech
+            stopSpeech();
+
+            // Scroll to reading section
+            document.getElementById('readingSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function goBack() {
+            stopSpeech();
+            document.getElementById('readingSection').classList.remove('visible');
+            document.getElementById('instructions').style.display = 'block';
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleSpeech() {
+            if (isPlaying) {
+                stopSpeech();
+            } else {
+                startSpeech();
+            }
+        }
+
+        function startSpeech() {
+            stopSpeech();
+
+            const text = document.getElementById('textContent').innerText + " " + 
+                        document.getElementById('athleteInfo').innerText;
+            
+            currentUtterance = new SpeechSynthesisUtterance(text);
+            currentUtterance.lang = 'fr-CA';
+            currentUtterance.rate = parseFloat(document.getElementById('speedSlider').value);
+            currentUtterance.pitch = 1;
+
+            // Chercher une voix française
+            const voices = speechSynthesis.getVoices();
+            const frenchVoice = voices.find(voice => voice.lang.startsWith('fr'));
+            if (frenchVoice) {
+                currentUtterance.voice = frenchVoice;
+            }
+
+            currentUtterance.onstart = () => {
+                isPlaying = true;
+                updatePlayButton(true);
+            };
+
+            currentUtterance.onend = () => {
+                isPlaying = false;
+                updatePlayButton(false);
+            };
+
+            currentUtterance.onerror = () => {
+                isPlaying = false;
+                updatePlayButton(false);
+            };
+
+            speechSynthesis.speak(currentUtterance);
+        }
+
+        function stopSpeech() {
+            speechSynthesis.cancel();
+            isPlaying = false;
+            updatePlayButton(false);
+        }
+
+        function updatePlayButton(playing) {
+            const btn = document.getElementById('btnListen');
+            const icon = document.getElementById('listenIcon');
+            const text = document.getElementById('listenText');
+
+            if (playing) {
+                btn.classList.add('playing');
+                icon.textContent = '⏸️';
+                text.textContent = 'Pause';
+            } else {
+                btn.classList.remove('playing');
+                icon.textContent = '🔊';
+                text.textContent = 'Écouter';
+            }
+        }
+
+        // Charger les voix (nécessaire pour certains navigateurs)
+        speechSynthesis.onvoiceschanged = () => {
+            speechSynthesis.getVoices();
+        };
+    </script>
+</body>
+</html>
